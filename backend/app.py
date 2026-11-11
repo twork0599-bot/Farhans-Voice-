@@ -194,3 +194,15 @@ async def generate(text: str = Form(...), voice_id: str = Form(...),
         raise
     except Exception as exc:
         raise HTTPException(500, f"Generation failed ({type(exc).__name__}); check server logs.")
+
+@app.get("/history/{generation_id}/audio")
+def download_generation(generation_id: str, x_admin_token: str = Header(default="")):
+    require_admin(x_admin_token)
+    with db() as con:
+        row = con.execute("SELECT filename FROM generations WHERE id=?", (generation_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Generation not found.")
+    path = OUTPUTS / row["filename"]
+    if not path.is_file():
+        raise HTTPException(404, "Audio file is no longer available.")
+    return FileResponse(path, media_type="audio/wav", filename="farhan-voice.wav")
