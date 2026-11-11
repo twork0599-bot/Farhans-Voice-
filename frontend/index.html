@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farhan's Voice Studio</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#0b1020;color:#eef2ff;font:16px system-ui}main{width:min(620px,100%);padding:28px;border:1px solid #293653;border-radius:22px;background:#151d33;box-shadow:0 20px 70px #0006}h1{margin:0 0 8px;font-size:30px}p,small{color:#aab6d1;line-height:1.55}.field{margin:22px 0}label{display:block;margin-bottom:9px;font-weight:600}textarea,input{width:100%;padding:13px;border:1px solid #354362;border-radius:12px;background:#0e1629;color:white;font:inherit}textarea{min-height:125px;resize:vertical}button{width:100%;padding:15px;border:0;border-radius:12px;background:#7c6cff;color:white;font-size:16px;font-weight:700;cursor:pointer}button:disabled{opacity:.5;cursor:wait}.status{margin-top:16px;color:#c7d2fe}audio{width:100%;margin-top:18px}
+</style></head>
+<body><main>
+<h1>Farhan's Voice Studio</h1>
+<p>Generate speech from text using a voice sample you own or have permission to use.</p>
+<form id="form">
+<div class="field"><label for="text">Text to speak</label><textarea id="text" maxlength="1000" required placeholder="Type your text here..."></textarea></div>
+<div class="field"><label for="audio">Reference voice sample</label><input id="audio" type="file" accept=".wav,.mp3,.m4a,.flac,audio/*" required><small>Clear recording, maximum 20 MB.</small></div>
+<button id="submit">Generate voice</button></form>
+<div class="status" id="status" role="status"></div><audio id="player" controls hidden></audio>
+<p><small>Consent required. Do not impersonate anyone or use another person's voice without permission.</small></p>
+</main>
+<script>
+const form=document.querySelector('#form'),button=document.querySelector('#submit'),status=document.querySelector('#status'),player=document.querySelector('#player');
+form.addEventListener('submit',async e=>{e.preventDefault();const data=new FormData();data.append('text',document.querySelector('#text').value);data.append('reference_audio',document.querySelector('#audio').files[0]);button.disabled=true;status.textContent='Generating… first run may take a few minutes.';player.hidden=true;try{const res=await fetch('/generate',{method:'POST',body:data});if(!res.ok){const err=await res.json();throw new Error(err.detail||'Request failed')}const blob=await res.blob(),url=URL.createObjectURL(blob);player.src=url;player.hidden=false;player.load();status.textContent='Audio is ready.';const a=document.createElement('a');a.href=url;a.download='farhan-voice.wav';a.click()}catch(err){status.textContent='Error: '+err.message}finally{button.disabled=false}});
+</script></body></html>
