@@ -1,9 +1,10 @@
 FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libsndfile1 && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-COPY app.py .
+COPY backend/app.py ./app.py
+COPY frontend ./frontend
 RUN mkdir -p outputs
 EXPOSE 8000
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
