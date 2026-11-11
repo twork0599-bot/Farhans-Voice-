@@ -12,6 +12,7 @@ from chatterbox.tts import ChatterboxTTS
 
 BASE = Path(__file__).parent
 OUTPUTS = BASE / "outputs"
+FRONTEND = Path("/app/frontend")
 OUTPUTS.mkdir(exist_ok=True)
 MAX_AUDIO_BYTES = 20 * 1024 * 1024
 ALLOWED = {".wav", ".mp3", ".m4a", ".flac"}
@@ -31,6 +32,10 @@ def load_model():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         _model = ChatterboxTTS.from_pretrained(device=device)
     return _model
+
+@app.get("/")
+def home():
+    return FileResponse(FRONTEND / "index.html")
 
 @app.get("/health")
 def health():
