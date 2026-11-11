@@ -1,0 +1,15 @@
+services:
+  voice-api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/outputs:/app/outputs
+      - model-cache:/root/.cache
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:8000
+    gpus: all
+    restart: unless-stopped
+
+volumes:
+  model-cache:
