@@ -1,27 +1,33 @@
 # Farhan's Voice Studio
 
-A self-hosted voice-cloning starter with a simple web interface and FastAPI backend. It runs the open-source Chatterbox model locally; no paid voice-generation API is used.
+A self-hosted voice-cloning workspace with a private admin dashboard, voice library, audio generation, generation history, and consented dataset collection. It uses the open-source Chatterbox model locally; no paid voice-generation API is used.
 
-## Run it
+## Run locally
 
-1. Install Docker Desktop (Windows/macOS) or Docker Engine (Linux). For GPU use, install compatible NVIDIA drivers and the NVIDIA Container Toolkit.
+1. Install Docker Desktop or Docker Engine. For GPU inference, install compatible NVIDIA drivers and NVIDIA Container Toolkit.
 2. Clone this repository.
-3. From the repository folder, run `docker compose up --build`.
-4. Open http://localhost:8000.
+3. Set a private admin token before starting:
+   - Linux/macOS: `export ADMIN_TOKEN='your-long-random-secret'`
+   - PowerShell: `$env:ADMIN_TOKEN='your-long-random-secret'`
+4. Run `docker compose up --build`.
+5. Open http://localhost:8000 and sign in with the token.
 
-The first generation downloads model weights and can take several minutes. A CUDA-capable NVIDIA GPU is strongly recommended. CPU mode may be very slow; if Docker cannot access an NVIDIA GPU, remove the `gpus: all` line from docker-compose.yml.
+The first model load downloads model weights and can take several minutes. An NVIDIA GPU is strongly recommended. For CPU-only testing, remove `gpus: all` from docker-compose.yml; generation may be very slow.
 
-## What is included
+## Included
 
-- Upload a reference voice sample (WAV, MP3, M4A, or FLAC; up to 20 MB).
-- Enter text and generate a WAV file.
-- Download and play the generated audio.
-- Health endpoint at `/health`.
+- Admin dashboard with runtime status and generation counts.
+- Voice library: upload, save, and delete reference voice profiles.
+- Text-to-speech generation from a saved voice profile.
+- WAV playback and download.
+- Dataset collection with speaker labels and consent confirmation.
+- Dataset manifest export endpoint.
+- SQLite metadata database and persistent local data volume.
 
-## Limitations
+## Important limitations
 
-This starter uses Chatterbox's supported model/language capabilities. Do not assume Bengali output quality or Bengali support without testing the selected model. It does not yet include user accounts, an admin dashboard, persistent voice profiles, training/fine-tuning, job queues, or production-grade storage. GitHub stores the source; a GPU-capable host is needed to run inference. Vercel/Netlify alone cannot run this GPU model.
+The current engine is Chatterbox's reference-audio voice cloning path. It is not a fine-tuning/training pipeline. The dataset section collects consented recordings and produces a manifest; a model-specific training recipe, validation process, and GPU training job still need to be added separately. Bengali language support and quality must be verified against the selected model version before relying on it. This MVP is intended for private/local use; before public deployment add HTTPS, stronger user management, rate limits, storage cleanup, and audit logs. GitHub stores the code but does not run GPU inference; deploy the backend to a GPU-capable server.
 
-## Consent and safety
+## Safety
 
-Only upload a voice sample when you have the speaker's informed permission. Do not use the system to impersonate, defraud, or mislead others. Add authentication, rate limits, private storage, and abuse monitoring before exposing it publicly.
+Only upload or clone voices when the speaker has given informed permission. Do not use the system for impersonation, fraud, or deception.
